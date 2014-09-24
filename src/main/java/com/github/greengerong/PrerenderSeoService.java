@@ -259,14 +259,19 @@ public class PrerenderSeoService {
 
 
     private boolean isInResources(final String url) {
-        return from(prerenderConfig.getExtensionsToIgnore()).anyMatch(new Predicate<String>() {
+        boolean safeToIgnore = from(prerenderConfig.getExtensionsToIgnore()).anyMatch(new Predicate<String>() {
             @Override
             public boolean apply(String item) {
                 return (url.indexOf('?') >= 0 ? url.substring(0, url.indexOf('?')) : url)
                         .toLowerCase().endsWith(item);
             }
         });
+        return (safeToIgnore  ||
+                (url.contains("/asset/")
+                    && (url.endsWith("data=1") || url.endsWith("metadata=1"))));
     }
+
+
 
     private boolean isInWhiteList(final String url, List<String> whitelist) {
         return from(whitelist).anyMatch(new Predicate<String>() {
